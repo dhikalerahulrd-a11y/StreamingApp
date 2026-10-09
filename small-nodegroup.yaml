@@ -1,0 +1,20 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: streamingapp-cluster
+  region: ap-south-1
+
+managedNodeGroups:
+  - name: streamingapp-small-nodes
+    instanceType: t3.small
+    desiredCapacity: 1
+    minSize: 1
+    maxSize: 1
+    volumeSize: 20
+    subnets:
+      - subnet-04e978f75ade76042
+      - subnet-0f0b0f3403e6d4f51
+      - subnet-03b7935ca1c83e942
+    iam:
+      instanceRoleARN: arn:aws:iam::916080963016:role/eksctl-streamingapp-cluster-nodegr-NodeInstanceRole-CgzS5XwgVQqh

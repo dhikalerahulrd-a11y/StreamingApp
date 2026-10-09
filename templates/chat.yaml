@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: streamingapp-chat
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: streamingapp-chat
+  template:
+    metadata:
+      labels:
+        app: streamingapp-chat
+    spec:
+      containers:
+        - name: chat
+          image: "{{ .Values.services.chat.image.repository }}:{{ .Values.services.chat.image.tag }}"
+          imagePullPolicy: "{{ .Values.services.chat.image.pullPolicy }}"
+          ports:
+            - containerPort: 3004
+          env:
+            - name: PORT
+              value: "3004"
+            - name: MONGO_URI
+              value: "mongodb://mongo:27017/{{ .Values.mongo.database }}"
+            - name: JWT_SECRET
+              value: "changeme"
+            - name: CLIENT_URLS
+              value: "http://frontend"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chat
+spec:
+  type: ClusterIP
+  selector:
+    app: streamingapp-chat
+  ports:
+    - port: 3004
+      targetPort: 3004

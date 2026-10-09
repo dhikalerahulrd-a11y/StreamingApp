@@ -1,0 +1,71 @@
+replicaCount: 1
+
+services:
+  frontend:
+    image:
+      repository: rddhikale/streaming-frontend
+      tag: "1.0.0"
+      pullPolicy: IfNotPresent
+    port: 80
+
+  auth:
+    image:
+      repository: rddhikale/streaming-auth
+      tag: "1.0.0"
+      pullPolicy: IfNotPresent
+    port: 3001
+
+  streaming:
+    image:
+      repository: rddhikale/streaming-stream
+      tag: "1.0.0"
+      pullPolicy: IfNotPresent
+    port: 3002
+
+  admin:
+    image:
+      repository: rddhikale/streaming-admin
+      tag: "1.0.0"
+      pullPolicy: IfNotPresent
+    port: 3003
+
+  chat:
+    image:
+      repository: rddhikale/streaming-chat
+      tag: "1.0.0"
+      pullPolicy: IfNotPresent
+    port: 3004
+
+  mongo:
+    image:
+      repository: mongo
+      tag: "6"
+      pullPolicy: IfNotPresent
+    port: 27017
+
+mongo:
+  host: mongo.streaming.svc.cluster.local
+  database: streamingapp
+
+ingress:
+  enabled: true
+  className: alb
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+  hosts:
+    - host: ""
+      paths:
+        - path: /
+          pathType: Prefix
+
+resources: {}
+
+autoscaling:
+  enabled: false
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

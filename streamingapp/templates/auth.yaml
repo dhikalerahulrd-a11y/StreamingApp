@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: streamingapp-auth
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: streamingapp-auth
+  template:
+    metadata:
+      labels:
+        app: streamingapp-auth
+    spec:
+      containers:
+        - name: auth
+          image: "{{ .Values.services.auth.image.repository }}:{{ .Values.services.auth.image.tag }}"
+          imagePullPolicy: "{{ .Values.services.auth.image.pullPolicy }}"
+          ports:
+            - containerPort: 3001
+          env:
+            - name: PORT
+              value: "3001"
+            - name: MONGO_URI
+              value: "mongodb://mongo.streaming.svc.cluster.local:27017/{{ .Values.mongo.database }}"
+            - name: JWT_SECRET
+              value: "changeme"
+            - name: CLIENT_URLS
+              value: "http://k8s-streamin-streamin-1160eeb89c-1828266227.ap-south-1.elb.amazonaws.com"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth
+spec:
+  type: ClusterIP
+  selector:
+    app: streamingapp-auth
+  ports:
+    - port: 3001
+      targetPort: 3001

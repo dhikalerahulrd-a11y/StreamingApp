@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: streamingapp-streaming
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: streamingapp-streaming
+  template:
+    metadata:
+      labels:
+        app: streamingapp-streaming
+    spec:
+      containers:
+        - name: streaming
+          image: "{{ .Values.services.streaming.image.repository }}:{{ .Values.services.streaming.image.tag }}"
+          imagePullPolicy: "{{ .Values.services.streaming.image.pullPolicy }}"
+          ports:
+            - containerPort: 3002
+          env:
+            - name: PORT
+              value: "3002"
+            - name: MONGO_URI
+              value: "mongodb://mongo.streaming.svc.cluster.local:27017/{{ .Values.mongo.database }}"
+            - name: JWT_SECRET
+              value: "changeme"
+            - name: CLIENT_URLS
+              value: "http://k8s-streamin-streamin-1160eeb89c-1828266227.ap-south-1.elb.amazonaws.com"
+            - name: STREAMING_PUBLIC_URL
+              value: "http://streaming:3002"
+            - name: AWS_REGION
+              value: "ap-south-1"
+            - name: AWS_S3_BUCKET
+              value: "streamingapp5943"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: streaming
+spec:
+  type: ClusterIP
+  selector:
+    app: streamingapp-streaming
+  ports:
+    - port: 3002
+      targetPort: 3002
